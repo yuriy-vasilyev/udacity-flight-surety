@@ -1,0 +1,10 @@
+{
+  "overrides": [
+    {
+      "files": ["**/*.sol", "**/*.css", "**/*.scss", "**/*.html"]
+    }
+  ],
+  "tabWidth": 2,
+  "trailingComma": "es5",
+  "plugins": ["prettier-plugin-solidity"]
+}

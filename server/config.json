@@ -1,0 +1,22 @@
+{
+  "url": "http://10.10.12.24:8545",
+  "dataAddress": "0xA1C92b66d6266519F69FeBb59c7f6FE823Ec28dD",
+  "owner": {
+    "address": "0x5e3Cb814de1B47b15e3Ff5983Aa65981dE0DbA2C",
+    "key": "0x1c0788caf425312d5ba69780f5bf37333f4618829087fb471989e19160827d16"
+  },
+  "oracles": [
+    {
+      "address": "0x9234f86a21034231759CbcE4bFDb9a4241A0FdAd",
+      "key": "0x5b96da3fdb25ce1e754b5e32fc4c5c31f20b67b9182e1b324beaba05a3a401a5"
+    },
+    {
+      "address": "0xd71074DeAe9b5b54e97F2c5505Df72BDe732E901",
+      "key": "0x553b0041bcc8dbd3499afe14858ef6368fabc299d2dfaf3c5d8361e372113bec"
+    },
+    {
+      "address": "0x4bd5a9ec53bEAf3B70cF660fc5dcE0f501D14BFa",
+      "key": "0x7852a0e09219717763af2af4786148122178bb1d9860251311b3588147eb035b"
+    }
+  ]
+}

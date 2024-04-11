@@ -1,17 +1,15 @@
 const express = require("express");
 const { ethers } = require("ethers");
 const config = require("./config.json");
-const FlightSuretyData = require("../contracts/build/contracts/FlightSuretyData.json");
+const FlightSuretyData = require("../contracts/artifacts/contracts/FlightSuretyData.sol/FlightSuretyData.json");
 
-const registerOracles = async (contract) => {
+const registerOracles = async (contract, provider) => {
   for (const oracle of config.oracles) {
-    const theContract = contract.connect(oracle.address);
+    const signer = new ethers.Wallet(oracle.key, provider);
 
-    const result = await theContract.registerOracle({
+    await contract.connect(signer).registerOracle({
       value: ethers.parseEther("1"),
     });
-
-    console.log("Oracle registered!", result);
   }
 };
 
@@ -28,7 +26,7 @@ const init = async () => {
 
   initEvents(contract);
 
-  await registerOracles(contract);
+  await registerOracles(contract, provider);
 };
 
 const initEvents = (contract) => {

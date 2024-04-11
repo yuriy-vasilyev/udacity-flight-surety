@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: MIT
 // Tells the Solidity compiler to compile only from v0.8.24 to v0.9.0
-pragma solidity ^0.8.25;
+pragma solidity ^0.8.24;
 
 // Contracts
 import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";

@@ -2,7 +2,7 @@
 
 import { createContext, FC, ReactNode, useEffect, useState } from "react";
 import { BrowserProvider, Contract, Signer } from "ethers";
-import dataContractArtifact from "../../../contracts/build/contracts/FlightSuretyData.json";
+import dataContractArtifact from "../../../contracts/artifacts/contracts/FlightSuretyData.sol/FlightSuretyData.json";
 import { APP_CONTRACT_ADDRESS } from "@/constants";
 
 interface ContractContextType {

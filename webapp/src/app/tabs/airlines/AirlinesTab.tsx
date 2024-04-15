@@ -1,6 +1,7 @@
 import { FC } from "react";
 import RegisterAirlineForm from "@/app/tabs/airlines/RegisterAirlineForm";
 import FundAirlineForm from "@/app/tabs/airlines/FundAirlineForm";
+import RegisterFlightForm from "@/app/tabs/airlines/RegisterFlightForm";
 
 const AirlinesTab: FC = () => {
   return (
@@ -9,6 +10,7 @@ const AirlinesTab: FC = () => {
       <div className="mt-6 flex flex-col gap-6 md:gap-10">
         <RegisterAirlineForm />
         <FundAirlineForm />
+        <RegisterFlightForm />
       </div>
     </div>
   );

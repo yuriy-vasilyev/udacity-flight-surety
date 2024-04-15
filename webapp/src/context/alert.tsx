@@ -154,7 +154,7 @@ const AlertProvider: FC<AlertProviderProps> = ({ children }) => {
               </div>
               <div className="ml-3 flex-1 md:flex md:justify-between">
                 <p
-                  className={classNames("text-sm", {
+                  className={classNames("text-sm break-words", {
                     "text-green-800": params.type === "success",
                     "text-red-800": params.type === "error",
                     "text-blue-800": params.type === "info",

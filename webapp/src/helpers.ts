@@ -5,6 +5,8 @@ export const getErrorMessage = (error: unknown): string => {
   if (error instanceof Error) {
     // @ts-ignore
     return error.info?.error?.data?.data?.reason ?? error.message;
+  } else if (typeof error === "string") {
+    return error;
   } else {
     return "An error occurred";
   }

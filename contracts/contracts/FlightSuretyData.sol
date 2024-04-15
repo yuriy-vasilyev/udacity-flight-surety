@@ -40,10 +40,13 @@ contract FlightSuretyData is Ownable, Pausable, ReentrancyGuard {
   }
 
   struct Flight {
-    uint256 name;
+    string name;
+    uint256 updatedTimestamp;
+    uint256 datetime;
+    string origin;
+    string destination;
     bool isRegistered;
     uint8 statusCode;
-    uint256 updatedTimestamp;
     address airline;
   }
 
@@ -53,7 +56,7 @@ contract FlightSuretyData is Ownable, Pausable, ReentrancyGuard {
   mapping(bytes32 => Insurance[]) private insurances;
   mapping(address => uint256) private passengerCredits;
   mapping(address => address[]) private airlineRegistrationVotes;
-  mapping(bytes32 => Flight) private flights;
+  mapping(bytes32 => Flight) public flights;
 
   // Events
   event AirlineRegistered(address airline);
@@ -76,6 +79,11 @@ contract FlightSuretyData is Ownable, Pausable, ReentrancyGuard {
       airlines[msg.sender].isRegistered,
       "Caller is not a registered airline."
     );
+    _;
+  }
+
+  modifier onlyFundedAirline() {
+    require(airlines[msg.sender].isFunded, "Caller is not a funded airline.");
     _;
   }
 
@@ -119,18 +127,24 @@ contract FlightSuretyData is Ownable, Pausable, ReentrancyGuard {
   }
 
   function registerFlight(
-    uint256 name,
-    address airline,
-    uint256 timestamp
-  ) public onlyAirline {
-    bytes32 flightKey = keccak256(abi.encodePacked(airline, name, timestamp));
+    string memory name,
+    uint256 timestamp,
+    string memory origin,
+    string memory destination
+  ) public onlyFundedAirline {
+    bytes32 flightKey = keccak256(
+      abi.encodePacked(msg.sender, name, timestamp)
+    );
 
     flights[flightKey] = Flight({
       name: name,
+      datetime: timestamp,
+      updatedTimestamp: timestamp,
+      origin: origin,
+      destination: destination,
       isRegistered: true,
       statusCode: STATUS_CODE_UNKNOWN,
-      updatedTimestamp: timestamp,
-      airline: airline
+      airline: msg.sender
     });
 
     emit FlightRegistered(flightKey, STATUS_CODE_UNKNOWN);
@@ -263,7 +277,7 @@ contract FlightSuretyData is Ownable, Pausable, ReentrancyGuard {
     public
     view
     returns (
-      uint256 name,
+      string memory name,
       bool isRegistered,
       uint8 statusCode,
       uint256 updatedTimestamp,

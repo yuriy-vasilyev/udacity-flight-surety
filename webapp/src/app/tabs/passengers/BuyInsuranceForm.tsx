@@ -1,4 +1,4 @@
-import { FC, Fragment } from "react";
+import { FC, Fragment, useEffect } from "react";
 import useContract from "@/hooks/useContract";
 import * as Yup from "yup";
 import { useFormik } from "formik";
@@ -38,12 +38,16 @@ const BuyInsuranceForm: FC = () => {
   const { alert } = useAlert();
   const { flights, error, loading } = useFlights();
 
-  if (error) {
+  useEffect(() => {
+    if (!error) {
+      return;
+    }
+
     alert({
       type: "error",
-      message: error,
+      message: getErrorMessage(error),
     });
-  }
+  }, [error]);
 
   const formik = useFormik<FormType>({
     initialValues: INITIAL_VALUES,
@@ -74,7 +78,7 @@ const BuyInsuranceForm: FC = () => {
     },
   });
 
-  const chosenFlight = flights[formik.values.index];
+  const chosenFlight = flights.length > 0 ? flights[formik.values.index] : null;
 
   const generateFlightLabel = (flight: Flight) =>
     flight
@@ -103,92 +107,103 @@ const BuyInsuranceForm: FC = () => {
             <div className="md:col-span-2">
               <div>
                 <div className="mt-2">
-                  <Listbox
-                    value={formik.values.index}
-                    onChange={(value) => formik.setFieldValue("index", value)}
-                  >
-                    {({ open }) => (
-                      <>
-                        <Listbox.Label className="block text-sm font-medium leading-6 text-gray-900">
-                          Flight
-                        </Listbox.Label>
-                        <div className="relative mt-2">
-                          <Listbox.Button className="relative w-full cursor-default rounded-md bg-white py-1.5 pl-3 pr-10 text-left text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:outline-none focus:ring-2 focus:ring-emerald-600 sm:text-sm sm:leading-6">
-                            <span className="block truncate">
-                              {generateFlightLabel(chosenFlight)}
-                            </span>
-                            <span className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2">
-                              <ChevronUpDownIcon
-                                className="h-5 w-5 text-gray-400"
-                                aria-hidden="true"
-                              />
-                            </span>
-                          </Listbox.Button>
+                  {loading && <p>Loading flights...</p>}
+                  {flights.length === 0 && <p>No flights found.</p>}
+                  {flights.length > 0 && chosenFlight === null && (
+                    <p>No chosen flight.</p>
+                  )}
+                  {flights.length > 0 && chosenFlight !== null && (
+                    <>
+                      <Listbox
+                        value={formik.values.index}
+                        onChange={(value) =>
+                          formik.setFieldValue("index", value)
+                        }
+                      >
+                        {({ open }) => (
+                          <>
+                            <Listbox.Label className="block text-sm font-medium leading-6 text-gray-900">
+                              Flight
+                            </Listbox.Label>
+                            <div className="relative mt-2">
+                              <Listbox.Button className="relative w-full cursor-default rounded-md bg-white py-1.5 pl-3 pr-10 text-left text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:outline-none focus:ring-2 focus:ring-emerald-600 sm:text-sm sm:leading-6">
+                                <span className="block truncate">
+                                  {generateFlightLabel(chosenFlight)}
+                                </span>
+                                <span className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2">
+                                  <ChevronUpDownIcon
+                                    className="h-5 w-5 text-gray-400"
+                                    aria-hidden="true"
+                                  />
+                                </span>
+                              </Listbox.Button>
 
-                          <Transition
-                            show={open}
-                            as={Fragment}
-                            leave="transition ease-in duration-100"
-                            leaveFrom="opacity-100"
-                            leaveTo="opacity-0"
-                          >
-                            <Listbox.Options className="absolute z-10 mt-1 max-h-60 w-full overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm">
-                              {flights.length > 0 &&
-                                flights.map((item, index) => (
-                                  <Listbox.Option
-                                    key={index}
-                                    className={({ active }) =>
-                                      classNames(
-                                        active
-                                          ? "bg-emerald-600 text-white"
-                                          : "text-gray-900",
-                                        "relative cursor-default select-none py-2 pl-3 pr-9",
-                                      )
-                                    }
-                                    value={index}
-                                  >
-                                    {({ selected, active }) => (
-                                      <>
-                                        <span
-                                          className={classNames(
-                                            selected
-                                              ? "font-semibold"
-                                              : "font-normal",
-                                            "block truncate",
-                                          )}
-                                        >
-                                          {generateFlightLabel(item)}
-                                        </span>
+                              <Transition
+                                show={open}
+                                as={Fragment}
+                                leave="transition ease-in duration-100"
+                                leaveFrom="opacity-100"
+                                leaveTo="opacity-0"
+                              >
+                                <Listbox.Options className="absolute z-10 mt-1 max-h-60 w-full overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm">
+                                  {flights.length > 0 &&
+                                    flights.map((item, index) => (
+                                      <Listbox.Option
+                                        key={index}
+                                        className={({ active }) =>
+                                          classNames(
+                                            active
+                                              ? "bg-emerald-600 text-white"
+                                              : "text-gray-900",
+                                            "relative cursor-default select-none py-2 pl-3 pr-9",
+                                          )
+                                        }
+                                        value={index}
+                                      >
+                                        {({ selected, active }) => (
+                                          <>
+                                            <span
+                                              className={classNames(
+                                                selected
+                                                  ? "font-semibold"
+                                                  : "font-normal",
+                                                "block truncate",
+                                              )}
+                                            >
+                                              {generateFlightLabel(item)}
+                                            </span>
 
-                                        {selected ? (
-                                          <span
-                                            className={classNames(
-                                              active
-                                                ? "text-white"
-                                                : "text-emerald-600",
-                                              "absolute inset-y-0 right-0 flex items-center pr-4",
-                                            )}
-                                          >
-                                            <CheckIcon
-                                              className="h-5 w-5"
-                                              aria-hidden="true"
-                                            />
-                                          </span>
-                                        ) : null}
-                                      </>
-                                    )}
-                                  </Listbox.Option>
-                                ))}
-                            </Listbox.Options>
-                          </Transition>
-                        </div>
-                      </>
-                    )}
-                  </Listbox>
-                  {formik.touched.index && formik.errors.index && (
-                    <p className="mt-3 text-sm leading-6 text-red-600">
-                      {formik.errors.index}
-                    </p>
+                                            {selected ? (
+                                              <span
+                                                className={classNames(
+                                                  active
+                                                    ? "text-white"
+                                                    : "text-emerald-600",
+                                                  "absolute inset-y-0 right-0 flex items-center pr-4",
+                                                )}
+                                              >
+                                                <CheckIcon
+                                                  className="h-5 w-5"
+                                                  aria-hidden="true"
+                                                />
+                                              </span>
+                                            ) : null}
+                                          </>
+                                        )}
+                                      </Listbox.Option>
+                                    ))}
+                                </Listbox.Options>
+                              </Transition>
+                            </div>
+                          </>
+                        )}
+                      </Listbox>
+                      {formik.touched.index && formik.errors.index && (
+                        <p className="mt-3 text-sm leading-6 text-red-600">
+                          {formik.errors.index}
+                        </p>
+                      )}
+                    </>
                   )}
                 </div>
               </div>

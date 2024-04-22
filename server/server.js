@@ -4,16 +4,15 @@ const config = require("./config.json");
 const FlightSuretyData = require("../contracts/artifacts/contracts/FlightSuretyData.sol/FlightSuretyData.json");
 
 const registerOracles = async (contract, provider) => {
-  try {
-    for (const oracle of config.oracles) {
-      const signer = new ethers.Wallet(oracle.key, provider);
+  for (const oracle of config.oracles) {
+    console.log("Registering oracle:", oracle.address);
 
-      await contract.connect(signer).registerOracle({
-        value: ethers.parseEther("1"),
-      });
-    }
-  } catch (error) {
-    console.error("Error registering oracles:", error);
+    const signer = new ethers.Wallet(oracle.key, provider);
+
+    await contract.connect(signer).registerOracle({
+      from: oracle.address,
+      value: ethers.parseEther("1"),
+    });
   }
 };
 

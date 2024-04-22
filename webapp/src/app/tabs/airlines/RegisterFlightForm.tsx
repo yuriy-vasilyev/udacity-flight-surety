@@ -1,35 +1,40 @@
-import { FC } from "react";
+import { FC, useEffect } from "react";
 import useContract from "@/hooks/useContract";
 import * as Yup from "yup";
 import { useFormik } from "formik";
 import { useAlert } from "@/hooks/alert";
-import { getErrorMessage } from "@/helpers";
-import moment from "moment";
+import { generateFlightKey, getErrorMessage } from "@/helpers";
+import { useFlights } from "@/hooks/useFlights";
+import FlightDropdown from "@/components/form/FlightDropdown";
+import { ethers } from "ethers";
 
 interface FormType {
-  airlineName: string;
-  datetime: number;
-  origin: string;
-  destination: string;
+  index: number;
 }
 
 const INITIAL_VALUES: FormType = {
-  airlineName: "",
-  datetime: moment().valueOf(),
-  origin: "",
-  destination: "",
+  index: 0,
 };
 
 const validationSchema = Yup.object().shape({
-  airlineName: Yup.string().required("This field is required."),
-  datetime: Yup.number().required("This field is required."),
-  origin: Yup.string().required("This field is required."),
-  destination: Yup.string().required("This field is required."),
+  index: Yup.number().required("This field is required."),
 });
 
 const RegisterFlightForm: FC = () => {
   const { contract } = useContract();
   const { alert } = useAlert();
+  const { flights, error: flightsError, loading } = useFlights();
+
+  useEffect(() => {
+    if (!flightsError) {
+      return;
+    }
+
+    alert({
+      type: "error",
+      message: getErrorMessage(flightsError),
+    });
+  }, [flightsError]);
 
   const formik = useFormik<FormType>({
     initialValues: INITIAL_VALUES,
@@ -37,11 +42,18 @@ const RegisterFlightForm: FC = () => {
     validateOnBlur: false,
     onSubmit: async (values) => {
       try {
-        await contract?.registerFlight(
-          values.airlineName,
-          values.datetime,
-          values.origin,
-          values.destination,
+        const chosenFlight = flights[values.index];
+
+        const flightKey = ethers.encodeBytes32String(
+          generateFlightKey(chosenFlight),
+        );
+
+        const tx = await contract?.registerFlight(
+          flightKey,
+          chosenFlight.name,
+          chosenFlight.datetime,
+          chosenFlight.origin,
+          chosenFlight.destination,
         );
 
         formik.resetForm();
@@ -78,102 +90,19 @@ const RegisterFlightForm: FC = () => {
             </div>
 
             <div className="md:col-span-2">
-              <div>
-                <label
-                  htmlFor="new-flight-name"
-                  className="block text-sm font-medium leading-6 text-gray-900"
-                >
-                  Airline name
-                </label>
-                <div className="mt-2">
-                  <input
-                    type="text"
-                    id="new-flight-name"
-                    className="block w-full rounded-md border-0 px-3 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-inset focus:ring-blue-600 sm:text-sm sm:leading-6"
-                    {...formik.getFieldProps("airlineName")}
-                  />
-                  {formik.touched.airlineName && formik.errors.airlineName && (
-                    <p className="mt-3 text-sm leading-6 text-red-600">
-                      {formik.errors.airlineName}
-                    </p>
-                  )}
-                </div>
-              </div>
-
-              <div className="mt-6">
-                <label
-                  htmlFor="new-flight-datetime"
-                  className="block text-sm font-medium leading-6 text-gray-900"
-                >
-                  Date and time
-                </label>
-                <div className="mt-2">
-                  <input
-                    type="datetime-local"
-                    id="new-flight-datetime"
-                    className="block w-full rounded-md border-0 px-3 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-inset focus:ring-blue-600 sm:text-sm sm:leading-6"
-                    {...formik.getFieldProps("datetime")}
-                    onChange={(e) => {
-                      formik.setFieldValue(
-                        "datetime",
-                        moment(e.target.value).valueOf(),
-                      );
-                    }}
-                    value={moment(formik.values.datetime).format(
-                      "YYYY-MM-DDTHH:mm",
-                    )}
-                  />
-                  {formik.touched.datetime && formik.errors.datetime && (
-                    <p className="mt-3 text-sm leading-6 text-red-600">
-                      {formik.errors.datetime}
-                    </p>
-                  )}
-                </div>
-              </div>
-
-              <div className="mt-6">
-                <label
-                  htmlFor="new-flight-origin"
-                  className="block text-sm font-medium leading-6 text-gray-900"
-                >
-                  Origin
-                </label>
-                <div className="mt-2">
-                  <input
-                    type="text"
-                    id="new-flight-origin"
-                    className="block w-full rounded-md border-0 px-3 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-inset focus:ring-blue-600 sm:text-sm sm:leading-6"
-                    {...formik.getFieldProps("origin")}
-                  />
-                  {formik.touched.origin && formik.errors.origin && (
-                    <p className="mt-3 text-sm leading-6 text-red-600">
-                      {formik.errors.origin}
-                    </p>
-                  )}
-                </div>
-              </div>
-
-              <div className="mt-6">
-                <label
-                  htmlFor="new-flight-destination"
-                  className="block text-sm font-medium leading-6 text-gray-900"
-                >
-                  Origin
-                </label>
-                <div className="mt-2">
-                  <input
-                    type="text"
-                    id="new-flight-destination"
-                    className="block w-full rounded-md border-0 px-3 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-inset focus:ring-blue-600 sm:text-sm sm:leading-6"
-                    {...formik.getFieldProps("destination")}
-                  />
-                  {formik.touched.destination && formik.errors.destination && (
-                    <p className="mt-3 text-sm leading-6 text-red-600">
-                      {formik.errors.destination}
-                    </p>
-                  )}
-                </div>
-              </div>
+              <FlightDropdown
+                flights={flights}
+                loading={loading}
+                value={formik.values.index}
+                onChange={(value: number) =>
+                  formik.setFieldValue("index", value)
+                }
+                error={
+                  formik.touched.index && formik.errors.index
+                    ? formik.errors.index
+                    : undefined
+                }
+              />
 
               <div className="mt-6">
                 <button

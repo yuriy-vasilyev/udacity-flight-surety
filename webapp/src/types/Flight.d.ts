@@ -1,24 +1,18 @@
-type FlightPeriod = {
-  startDate: string;
-  endDate: string;
-  daysOfOperation: string;
-};
+export interface UnregisteredFlight {
+  name: string;
+  datetime: number;
+  origin: string;
+  destination: string;
+}
 
-type DataElement = {
-  startLegSequenceNumber: number;
-  endLegSequenceNumber: number;
-  id: number;
-  value: string;
-};
-
-export interface Flight {
+export interface RegisteredFlight {
+  flightKey: string;
+  name: string;
+  datetime: number;
+  origin: string;
+  destination: string;
+  isRegistered: boolean;
+  statusCode: number;
+  updatedTimestamp: number;
   airline: string;
-  flightNumber: number;
-  suffix: string;
-  periodOfOperationUTC: FlightPeriod;
-  periodOfOperationLT: FlightPeriod;
-  legs: {
-    [key: string]: string | boolean | number;
-  }[];
-  dataElements: DataElement[];
 }

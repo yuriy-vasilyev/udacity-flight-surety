@@ -56,7 +56,7 @@ contract FlightSuretyData is Ownable, Pausable, ReentrancyGuard {
   mapping(bytes32 => Insurance[]) private insurances;
   mapping(address => uint256) private passengerCredits;
   mapping(address => address[]) private airlineRegistrationVotes;
-  mapping(bytes32 => Flight) public flights;
+  mapping(bytes32 => Flight) private flights;
 
   // Events
   event AirlineRegistered(address airline);
@@ -127,15 +127,12 @@ contract FlightSuretyData is Ownable, Pausable, ReentrancyGuard {
   }
 
   function registerFlight(
+    bytes32 flightKey,
     string memory name,
     uint256 timestamp,
     string memory origin,
     string memory destination
   ) public onlyFundedAirline {
-    bytes32 flightKey = keccak256(
-      abi.encodePacked(msg.sender, name, timestamp)
-    );
-
     flights[flightKey] = Flight({
       name: name,
       datetime: timestamp,
@@ -278,6 +275,9 @@ contract FlightSuretyData is Ownable, Pausable, ReentrancyGuard {
     view
     returns (
       string memory name,
+      uint256 datetime,
+      string memory origin,
+      string memory destination,
       bool isRegistered,
       uint8 statusCode,
       uint256 updatedTimestamp,
@@ -288,6 +288,9 @@ contract FlightSuretyData is Ownable, Pausable, ReentrancyGuard {
 
     return (
       flight.name,
+      flight.datetime,
+      flight.origin,
+      flight.destination,
       flight.isRegistered,
       flight.statusCode,
       flight.updatedTimestamp,
@@ -295,8 +298,8 @@ contract FlightSuretyData is Ownable, Pausable, ReentrancyGuard {
     );
   }
 
-  function getPassengerCredit(address passenger) public view returns (uint256) {
-    return passengerCredits[passenger];
+  function getPassengerCredit() public view returns (uint256) {
+    return passengerCredits[msg.sender];
   }
 
   function getInsuranceRatePercent() public pure returns (uint256) {

@@ -39,7 +39,6 @@ export interface FlightSuretyDataInterface extends Interface {
       | "authorizeContract"
       | "creditInsurees"
       | "deauthorizeContract"
-      | "flights"
       | "fundAirline"
       | "getAirlineCount"
       | "getAirlineInfo"
@@ -100,7 +99,6 @@ export interface FlightSuretyDataInterface extends Interface {
     functionFragment: "deauthorizeContract",
     values: [AddressLike]
   ): string;
-  encodeFunctionData(functionFragment: "flights", values: [BytesLike]): string;
   encodeFunctionData(
     functionFragment: "fundAirline",
     values?: undefined
@@ -131,7 +129,7 @@ export interface FlightSuretyDataInterface extends Interface {
   ): string;
   encodeFunctionData(
     functionFragment: "getPassengerCredit",
-    values: [AddressLike]
+    values?: undefined
   ): string;
   encodeFunctionData(
     functionFragment: "getVotesForAirline",
@@ -153,7 +151,7 @@ export interface FlightSuretyDataInterface extends Interface {
   ): string;
   encodeFunctionData(
     functionFragment: "registerFlight",
-    values: [string, BigNumberish, string, string]
+    values: [BytesLike, string, BigNumberish, string, string]
   ): string;
   encodeFunctionData(
     functionFragment: "registerOracle",
@@ -200,7 +198,6 @@ export interface FlightSuretyDataInterface extends Interface {
     functionFragment: "deauthorizeContract",
     data: BytesLike
   ): Result;
-  decodeFunctionResult(functionFragment: "flights", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "fundAirline",
     data: BytesLike
@@ -582,23 +579,6 @@ export interface FlightSuretyData extends BaseContract {
     "nonpayable"
   >;
 
-  flights: TypedContractMethod<
-    [arg0: BytesLike],
-    [
-      [string, bigint, bigint, string, string, boolean, bigint, string] & {
-        name: string;
-        updatedTimestamp: bigint;
-        datetime: bigint;
-        origin: string;
-        destination: string;
-        isRegistered: boolean;
-        statusCode: bigint;
-        airline: string;
-      }
-    ],
-    "view"
-  >;
-
   fundAirline: TypedContractMethod<[], [void], "payable">;
 
   getAirlineCount: TypedContractMethod<[], [bigint], "view">;
@@ -612,8 +592,11 @@ export interface FlightSuretyData extends BaseContract {
   getFlight: TypedContractMethod<
     [flightKey: BytesLike],
     [
-      [string, boolean, bigint, bigint, string] & {
+      [string, bigint, string, string, boolean, bigint, bigint, string] & {
         name: string;
+        datetime: bigint;
+        origin: string;
+        destination: string;
         isRegistered: boolean;
         statusCode: bigint;
         updatedTimestamp: bigint;
@@ -629,11 +612,7 @@ export interface FlightSuretyData extends BaseContract {
 
   getMyIndexes: TypedContractMethod<[], [[bigint, bigint, bigint]], "view">;
 
-  getPassengerCredit: TypedContractMethod<
-    [passenger: AddressLike],
-    [bigint],
-    "view"
-  >;
+  getPassengerCredit: TypedContractMethod<[], [bigint], "view">;
 
   getVotesForAirline: TypedContractMethod<
     [airline: AddressLike],
@@ -661,6 +640,7 @@ export interface FlightSuretyData extends BaseContract {
 
   registerFlight: TypedContractMethod<
     [
+      flightKey: BytesLike,
       name: string,
       timestamp: BigNumberish,
       origin: string,
@@ -719,24 +699,6 @@ export interface FlightSuretyData extends BaseContract {
     nameOrSignature: "deauthorizeContract"
   ): TypedContractMethod<[contractAddress: AddressLike], [void], "nonpayable">;
   getFunction(
-    nameOrSignature: "flights"
-  ): TypedContractMethod<
-    [arg0: BytesLike],
-    [
-      [string, bigint, bigint, string, string, boolean, bigint, string] & {
-        name: string;
-        updatedTimestamp: bigint;
-        datetime: bigint;
-        origin: string;
-        destination: string;
-        isRegistered: boolean;
-        statusCode: bigint;
-        airline: string;
-      }
-    ],
-    "view"
-  >;
-  getFunction(
     nameOrSignature: "fundAirline"
   ): TypedContractMethod<[], [void], "payable">;
   getFunction(
@@ -754,8 +716,11 @@ export interface FlightSuretyData extends BaseContract {
   ): TypedContractMethod<
     [flightKey: BytesLike],
     [
-      [string, boolean, bigint, bigint, string] & {
+      [string, bigint, string, string, boolean, bigint, bigint, string] & {
         name: string;
+        datetime: bigint;
+        origin: string;
+        destination: string;
         isRegistered: boolean;
         statusCode: bigint;
         updatedTimestamp: bigint;
@@ -775,7 +740,7 @@ export interface FlightSuretyData extends BaseContract {
   ): TypedContractMethod<[], [[bigint, bigint, bigint]], "view">;
   getFunction(
     nameOrSignature: "getPassengerCredit"
-  ): TypedContractMethod<[passenger: AddressLike], [bigint], "view">;
+  ): TypedContractMethod<[], [bigint], "view">;
   getFunction(
     nameOrSignature: "getVotesForAirline"
   ): TypedContractMethod<[airline: AddressLike], [bigint], "view">;
@@ -798,6 +763,7 @@ export interface FlightSuretyData extends BaseContract {
     nameOrSignature: "registerFlight"
   ): TypedContractMethod<
     [
+      flightKey: BytesLike,
       name: string,
       timestamp: BigNumberish,
       origin: string,

@@ -1,4 +1,4 @@
-import { Flight } from "@/types/Flight";
+import { UnregisteredFlight } from "@/types/Flight";
 import moment from "moment/moment";
 
 export const getErrorMessage = (error: unknown): string => {
@@ -12,9 +12,9 @@ export const getErrorMessage = (error: unknown): string => {
   }
 };
 
-export const generateFlightKey = (flight: Flight) => {
-  return `${flight.airline}-${flight.flightNumber}-${moment(flight.periodOfOperationUTC.startDate).format("YYYY-MM-DD")}`;
+export const generateFlightKey = (flight: UnregisteredFlight) => {
+  return `${flight.name}-${flight.origin}-${flight.destination}-${moment(flight.datetime).format("YYYY-MM-DD")}`;
 };
 
-export const formatFlightDate = (date: string) =>
-  moment(date).format("MMM D, YYYY");
+export const formatFlightDate = (datetime: number) =>
+  moment(datetime).format("MMM D, YYYY");

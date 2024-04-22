@@ -1,10 +1,11 @@
 import { useCallback, useEffect, useState } from "react";
-import { Flight } from "@/types/Flight";
+import { UnregisteredFlight } from "@/types/Flight";
 import { getErrorMessage } from "@/helpers";
 import useContract from "@/hooks/useContract";
+import axios from "axios";
 
 export function useFlights() {
-  const [flights, setFlights] = useState<Flight[]>([]);
+  const [flights, setFlights] = useState<UnregisteredFlight[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const { contract } = useContract();
@@ -18,8 +19,8 @@ export function useFlights() {
     setError("");
 
     try {
-      const result = await contract.flights();
-      console.log(result);
+      const { data } = await axios.get("/api/flights");
+      setFlights(data.data);
     } catch (error: unknown) {
       setError(getErrorMessage(error));
     } finally {

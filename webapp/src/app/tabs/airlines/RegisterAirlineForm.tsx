@@ -1,4 +1,4 @@
-import { FC } from "react";
+import { FC, useEffect } from "react";
 import useContract from "@/hooks/useContract";
 import * as Yup from "yup";
 import { useFormik } from "formik";
@@ -22,6 +22,24 @@ const validationSchema = Yup.object().shape({
 const RegisterAirlineForm: FC = () => {
   const { contract } = useContract();
   const { alert } = useAlert();
+
+  useEffect(() => {
+    if (!contract) {
+      return undefined;
+    }
+
+    (async () => {
+      try {
+        const result = await contract.getMyIndexes();
+        console.log(result);
+      } catch (error) {
+        alert({
+          type: "error",
+          message: getErrorMessage(error),
+        });
+      }
+    })();
+  }, [contract]);
 
   const formik = useFormik<FormType>({
     initialValues: INITIAL_VALUES,

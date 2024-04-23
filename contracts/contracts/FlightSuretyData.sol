@@ -333,9 +333,6 @@ contract FlightSuretyData is Ownable, Pausable, ReentrancyGuard {
 
   // region ORACLE MANAGEMENT
 
-  // Incremented to add pseudo-randomness at various points
-  uint8 private nonce = 0;
-
   // Fee to be paid when registering oracle
   uint256 public constant REGISTRATION_FEE = 1 ether;
 
@@ -459,7 +456,9 @@ contract FlightSuretyData is Ownable, Pausable, ReentrancyGuard {
   }
 
   // Returns array of three non-duplicating integers from 0-9
-  function generateIndexes(address account) internal returns (uint8[3] memory) {
+  function generateIndexes(
+    address account
+  ) internal view returns (uint8[3] memory) {
     uint8[3] memory indexes;
     indexes[0] = getRandomIndex(account);
 
@@ -477,21 +476,14 @@ contract FlightSuretyData is Ownable, Pausable, ReentrancyGuard {
   }
 
   // Returns array of three non-duplicating integers from 0-9
-  function getRandomIndex(address account) internal returns (uint8) {
-    uint8 maxValue = 10;
-
-    // Pseudo random number...the incrementing nonce adds variation
+  function getRandomIndex(address account) internal view returns (uint8) {
     uint8 random = uint8(
       uint256(
-        keccak256(abi.encodePacked(blockhash(block.number - nonce++), account))
-      ) % maxValue
+        keccak256(abi.encodePacked(block.prevrandao, block.timestamp, account))
+      )
     );
 
-    if (nonce > 250) {
-      nonce = 0; // Can only fetch blockhashes for last 256 blocks so we adapt
-    }
-
-    return random;
+    return random % 10;
   }
 
   // endregion

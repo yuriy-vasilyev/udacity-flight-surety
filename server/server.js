@@ -3,16 +3,19 @@ const { ethers } = require("ethers");
 const config = require("./config.json");
 const FlightSuretyData = require("../contracts/artifacts/contracts/FlightSuretyData.sol/FlightSuretyData.json");
 
-const registerOracles = async (contract, provider) => {
-  for (const oracle of config.oracles) {
+const registerOracles = async (contract) => {
+  for await (const oracle of config.oracles) {
     console.log("Registering oracle:", oracle.address);
 
-    const signer = new ethers.Wallet(oracle.key, provider);
+    const signer = new ethers.Wallet(oracle.key, contract.runner.provider);
 
-    await contract.connect(signer).registerOracle({
-      from: oracle.address,
+    const result = await contract.connect(signer).registerOracle({
       value: ethers.parseEther("1"),
     });
+
+    await result.wait();
+
+    console.log("Oracle registered:", oracle.address);
   }
 };
 
@@ -29,21 +32,21 @@ const init = async () => {
 
   initEvents(contract);
 
-  await registerOracles(contract, provider);
+  await registerOracles(contract);
 };
 
 const initEvents = (contract) => {
   contract
-    .on("OracleRegistered", (requestId, data) => {
-      console.log("OracleRegistered", requestId, data);
+    .on("OracleRegistered", (requestId) => {
+      console.log("OracleRegistered", requestId);
     })
     .catch((error) => {
       console.error("Error:", error);
     });
 
   contract
-    .on("OracleRequest", (requestId, data) => {
-      console.log("OracleRequest", requestId, data);
+    .on("OracleRequest", (requestId) => {
+      console.log("OracleRequest", requestId);
     })
     .catch((error) => {
       console.error("Error:", error);

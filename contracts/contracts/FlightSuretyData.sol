@@ -395,7 +395,7 @@ contract FlightSuretyData is Ownable, Pausable, ReentrancyGuard {
     // Revert if the oracle is already registered
     require(!oracles[msg.sender].isRegistered, "Oracle is already registered");
 
-    uint8[3] memory indexes = generateIndexes(msg.sender);
+    uint8[3] memory indexes = generateIndexes();
 
     oracles[msg.sender] = Oracle({isRegistered: true, indexes: indexes});
 
@@ -419,6 +419,8 @@ contract FlightSuretyData is Ownable, Pausable, ReentrancyGuard {
     uint256 timestamp,
     uint8 statusCode
   ) external {
+    require(oracles[msg.sender].isRegistered, "Oracle is not registered");
+
     require(
       (oracles[msg.sender].indexes[0] == index) ||
         (oracles[msg.sender].indexes[1] == index) ||
@@ -429,6 +431,7 @@ contract FlightSuretyData is Ownable, Pausable, ReentrancyGuard {
     bytes32 key = keccak256(
       abi.encodePacked(index, airline, flight, timestamp)
     );
+
     require(
       oracleResponses[key].isOpen,
       "Flight or timestamp do not match oracle request"
@@ -455,35 +458,47 @@ contract FlightSuretyData is Ownable, Pausable, ReentrancyGuard {
     return keccak256(abi.encodePacked(airline, flight, timestamp));
   }
 
-  // Returns array of three non-duplicating integers from 0-9
-  function generateIndexes(
-    address account
-  ) internal view returns (uint8[3] memory) {
-    uint8[3] memory indexes;
-    indexes[0] = getRandomIndex(account);
+  uint8[20][3] private oracleIndexes = [
+    [0, 1, 2],
+    [3, 4, 5],
+    [6, 7, 8],
+    [9, 0, 1],
+    [2, 3, 4],
+    [5, 6, 7],
+    [8, 9, 0],
+    [1, 2, 3],
+    [4, 5, 6],
+    [7, 8, 9],
+    [0, 1, 2],
+    [3, 4, 5],
+    [6, 7, 8],
+    [9, 0, 1],
+    [2, 3, 4],
+    [5, 6, 7],
+    [8, 9, 0],
+    [1, 2, 3],
+    [4, 5, 6],
+    [7, 8, 9]
+  ];
 
-    indexes[1] = indexes[0];
-    while (indexes[1] == indexes[0]) {
-      indexes[1] = getRandomIndex(account);
+  uint8 private nonce = 0;
+
+  function generateIndexes() internal view returns (uint8[3] memory) {
+    uint8 currentNonce = nonce;
+
+    uint8[3] memory newIndexes = [
+      oracleIndexes[currentNonce][0],
+      oracleIndexes[currentNonce][1],
+      oracleIndexes[currentNonce][2]
+    ];
+
+    if (nonce + 1 == oracleIndexes.length) {
+      nonce = 0;
+    } else {
+      nonce++;
     }
 
-    indexes[2] = indexes[1];
-    while ((indexes[2] == indexes[0]) || (indexes[2] == indexes[1])) {
-      indexes[2] = getRandomIndex(account);
-    }
-
-    return indexes;
-  }
-
-  // Returns array of three non-duplicating integers from 0-9
-  function getRandomIndex(address account) internal view returns (uint8) {
-    uint8 random = uint8(
-      uint256(
-        keccak256(abi.encodePacked(block.prevrandao, block.timestamp, account))
-      )
-    );
-
-    return random % 10;
+    return newIndexes;
   }
 
   // endregion

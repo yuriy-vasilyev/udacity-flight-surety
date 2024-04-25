@@ -458,7 +458,7 @@ contract FlightSuretyData is Ownable, Pausable, ReentrancyGuard {
     return keccak256(abi.encodePacked(airline, flight, timestamp));
   }
 
-  uint8[20][3] private oracleIndexes = [
+  uint8[3][20] private oracleIndexes = [
     [0, 1, 2],
     [3, 4, 5],
     [6, 7, 8],
@@ -483,7 +483,7 @@ contract FlightSuretyData is Ownable, Pausable, ReentrancyGuard {
 
   uint8 private nonce = 0;
 
-  function generateIndexes() internal view returns (uint8[3] memory) {
+  function generateIndexes() internal returns (uint8[3] memory) {
     uint8 currentNonce = nonce;
 
     uint8[3] memory newIndexes = [

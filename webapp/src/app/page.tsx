@@ -4,11 +4,10 @@ import classNames from "classnames";
 import { lazy, Suspense, useState } from "react";
 import AirlinesTab from "@/app/tabs/airlines";
 
-const OraclesTab = lazy(() => import("@/app/tabs/oracles"));
 const PassengersTab = lazy(() => import("@/app/tabs/passengers"));
 const HistoryTab = lazy(() => import("@/app/tabs/HistoryTab"));
 
-const tabs = ["Airlines", "Oracles", "Passengers", "History"];
+const tabs = ["Airlines", "Passengers", "History"];
 
 export default function Home() {
   const [index, setIndex] = useState(0);
@@ -70,9 +69,8 @@ export default function Home() {
       <div className="mt-8">
         <Suspense fallback={<div>Loading...</div>}>
           {index === 0 && <AirlinesTab />}
-          {index === 1 && <OraclesTab />}
-          {index === 2 && <PassengersTab />}
-          {index === 3 && <HistoryTab />}
+          {index === 1 && <PassengersTab />}
+          {index === 2 && <HistoryTab />}
         </Suspense>
       </div>
     </div>

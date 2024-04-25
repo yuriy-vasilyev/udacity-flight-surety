@@ -458,6 +458,8 @@ contract FlightSuretyData is Ownable, Pausable, ReentrancyGuard {
     return keccak256(abi.encodePacked(airline, flight, timestamp));
   }
 
+  // Indexes are hardcoded because auto-generation is not reliable,
+  // such operations run out of gas pretty often
   uint8[3][20] private oracleIndexes = [
     [0, 1, 2],
     [3, 4, 5],

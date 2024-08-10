@@ -30,6 +30,10 @@ declare module "hardhat/types/runtime" {
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.ReentrancyGuard__factory>;
     getContractFactory(
+      name: "FlightSuretyApp",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.FlightSuretyApp__factory>;
+    getContractFactory(
       name: "FlightSuretyData",
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.FlightSuretyData__factory>;
@@ -55,6 +59,11 @@ declare module "hardhat/types/runtime" {
       signer?: ethers.Signer
     ): Promise<Contracts.ReentrancyGuard>;
     getContractAt(
+      name: "FlightSuretyApp",
+      address: string | ethers.Addressable,
+      signer?: ethers.Signer
+    ): Promise<Contracts.FlightSuretyApp>;
+    getContractAt(
       name: "FlightSuretyData",
       address: string | ethers.Addressable,
       signer?: ethers.Signer
@@ -77,6 +86,10 @@ declare module "hardhat/types/runtime" {
       signerOrOptions?: ethers.Signer | DeployContractOptions
     ): Promise<Contracts.ReentrancyGuard>;
     deployContract(
+      name: "FlightSuretyApp",
+      signerOrOptions?: ethers.Signer | DeployContractOptions
+    ): Promise<Contracts.FlightSuretyApp>;
+    deployContract(
       name: "FlightSuretyData",
       signerOrOptions?: ethers.Signer | DeployContractOptions
     ): Promise<Contracts.FlightSuretyData>;
@@ -101,6 +114,11 @@ declare module "hardhat/types/runtime" {
       args: any[],
       signerOrOptions?: ethers.Signer | DeployContractOptions
     ): Promise<Contracts.ReentrancyGuard>;
+    deployContract(
+      name: "FlightSuretyApp",
+      args: any[],
+      signerOrOptions?: ethers.Signer | DeployContractOptions
+    ): Promise<Contracts.FlightSuretyApp>;
     deployContract(
       name: "FlightSuretyData",
       args: any[],

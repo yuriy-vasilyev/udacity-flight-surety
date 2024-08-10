@@ -7,5 +7,9 @@ export default buildModule("FlightSuretyModule", (m) => {
     config.firstAirlineAddress,
   ]);
 
-  return { flightSuretyData };
+  const flightSuretyApp = m.contract("FlightSuretyApp");
+
+  m.call(flightSuretyData, "authorizeContract", [config.appContractAddress]);
+
+  return { flightSuretyData, flightSuretyApp };
 });

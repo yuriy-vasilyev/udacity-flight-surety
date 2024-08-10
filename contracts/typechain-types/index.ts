@@ -14,5 +14,7 @@ export type { Pausable } from "./@openzeppelin/contracts/utils/Pausable";
 export { Pausable__factory } from "./factories/@openzeppelin/contracts/utils/Pausable__factory";
 export type { ReentrancyGuard } from "./@openzeppelin/contracts/utils/ReentrancyGuard";
 export { ReentrancyGuard__factory } from "./factories/@openzeppelin/contracts/utils/ReentrancyGuard__factory";
+export type { FlightSuretyApp } from "./contracts/FlightSuretyApp";
+export { FlightSuretyApp__factory } from "./factories/contracts/FlightSuretyApp__factory";
 export type { FlightSuretyData } from "./contracts/FlightSuretyData";
 export { FlightSuretyData__factory } from "./factories/contracts/FlightSuretyData__factory";

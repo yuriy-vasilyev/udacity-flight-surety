@@ -58,7 +58,7 @@ contract FlightSuretyData is Ownable, Pausable, ReentrancyGuard {
   constructor(
     address initialOwner,
     address airlineAddress,
-    string airlineName
+    string memory airlineName
   ) Ownable(initialOwner) {
     airlines[airlineAddress] = Airline({
       isRegistered: true,
@@ -71,7 +71,7 @@ contract FlightSuretyData is Ownable, Pausable, ReentrancyGuard {
   function registerAirline(
     address airlineAddress,
     string calldata name
-  ) external pure onlyAirline onlyAuthorizedContract {
+  ) external onlyAuthorizedContract {
     airlines[airlineAddress].isRegistered = true;
     airlines[airlineAddress].name = name;
 
@@ -89,14 +89,6 @@ contract FlightSuretyData is Ownable, Pausable, ReentrancyGuard {
     airlines[msg.sender].isFunded = true;
 
     emit AirlineFunded(msg.sender);
-  }
-
-  function getAirlineInfo(
-    address airline
-  ) external view returns (Airline memory) {
-    require(airlines[airline].isRegistered, "Airline is not registered.");
-
-    return airlines[airline];
   }
 
   function purchaseInsurance(

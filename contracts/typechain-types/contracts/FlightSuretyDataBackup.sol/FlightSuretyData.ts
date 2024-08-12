@@ -21,33 +21,31 @@ import type {
   TypedLogDescription,
   TypedListener,
   TypedContractMethod,
-} from "../common";
+} from "../../common";
 
 export declare namespace FlightSuretyData {
-  export type AirlineStruct = {
-    isRegistered: boolean;
-    isFunded: boolean;
-    name: string;
-  };
+  export type AirlineStruct = { isRegistered: boolean; isFunded: boolean };
 
   export type AirlineStructOutput = [
     isRegistered: boolean,
-    isFunded: boolean,
-    name: string
-  ] & { isRegistered: boolean; isFunded: boolean; name: string };
+    isFunded: boolean
+  ] & { isRegistered: boolean; isFunded: boolean };
 }
 
 export interface FlightSuretyDataInterface extends Interface {
   getFunction(
     nameOrSignature:
+      | "REGISTRATION_FEE"
       | "authorizeContract"
       | "creditInsurees"
       | "deauthorizeContract"
       | "fundAirline"
       | "getAirlineCount"
       | "getAirlineInfo"
+      | "getFlight"
       | "getInsuranceLimit"
       | "getInsuranceRatePercent"
+      | "getMyIndexes"
       | "getPassengerCredit"
       | "getVotesForAirline"
       | "getVotesThreshold"
@@ -55,9 +53,13 @@ export interface FlightSuretyDataInterface extends Interface {
       | "paused"
       | "purchaseInsurance"
       | "registerAirline"
+      | "registerFlight"
+      | "registerOracle"
       | "renounceOwnership"
       | "setPausableStatus"
+      | "submitOracleResponse"
       | "transferOwnership"
+      | "updateFlightStatus"
       | "withdrawCredit"
   ): FunctionFragment;
 
@@ -67,14 +69,24 @@ export interface FlightSuretyDataInterface extends Interface {
       | "AirlineRegistered"
       | "AuthorizedContract"
       | "DeauthorizedContract"
+      | "FlightRegistered"
+      | "FlightStatusInfo"
+      | "FlightStatusUpdated"
       | "InsuranceCredited"
       | "InsurancePurchased"
       | "InsuranceWithdrawn"
+      | "OracleRegistered"
+      | "OracleReport"
+      | "OracleRequest"
       | "OwnershipTransferred"
       | "Paused"
       | "Unpaused"
   ): EventFragment;
 
+  encodeFunctionData(
+    functionFragment: "REGISTRATION_FEE",
+    values?: undefined
+  ): string;
   encodeFunctionData(
     functionFragment: "authorizeContract",
     values: [AddressLike]
@@ -100,11 +112,19 @@ export interface FlightSuretyDataInterface extends Interface {
     values: [AddressLike]
   ): string;
   encodeFunctionData(
+    functionFragment: "getFlight",
+    values: [BytesLike]
+  ): string;
+  encodeFunctionData(
     functionFragment: "getInsuranceLimit",
     values?: undefined
   ): string;
   encodeFunctionData(
     functionFragment: "getInsuranceRatePercent",
+    values?: undefined
+  ): string;
+  encodeFunctionData(
+    functionFragment: "getMyIndexes",
     values?: undefined
   ): string;
   encodeFunctionData(
@@ -127,7 +147,15 @@ export interface FlightSuretyDataInterface extends Interface {
   ): string;
   encodeFunctionData(
     functionFragment: "registerAirline",
-    values: [AddressLike, string]
+    values: [AddressLike]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "registerFlight",
+    values: [BytesLike, string, BigNumberish, string, string]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "registerOracle",
+    values?: undefined
   ): string;
   encodeFunctionData(
     functionFragment: "renounceOwnership",
@@ -138,14 +166,26 @@ export interface FlightSuretyDataInterface extends Interface {
     values: [boolean]
   ): string;
   encodeFunctionData(
+    functionFragment: "submitOracleResponse",
+    values: [BigNumberish, AddressLike, string, BigNumberish, BigNumberish]
+  ): string;
+  encodeFunctionData(
     functionFragment: "transferOwnership",
     values: [AddressLike]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "updateFlightStatus",
+    values: [BytesLike, BigNumberish]
   ): string;
   encodeFunctionData(
     functionFragment: "withdrawCredit",
     values?: undefined
   ): string;
 
+  decodeFunctionResult(
+    functionFragment: "REGISTRATION_FEE",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(
     functionFragment: "authorizeContract",
     data: BytesLike
@@ -170,12 +210,17 @@ export interface FlightSuretyDataInterface extends Interface {
     functionFragment: "getAirlineInfo",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(functionFragment: "getFlight", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "getInsuranceLimit",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
     functionFragment: "getInsuranceRatePercent",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "getMyIndexes",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -201,6 +246,14 @@ export interface FlightSuretyDataInterface extends Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(
+    functionFragment: "registerFlight",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "registerOracle",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
     functionFragment: "renounceOwnership",
     data: BytesLike
   ): Result;
@@ -209,7 +262,15 @@ export interface FlightSuretyDataInterface extends Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(
+    functionFragment: "submitOracleResponse",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
     functionFragment: "transferOwnership",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "updateFlightStatus",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -266,6 +327,57 @@ export namespace DeauthorizedContractEvent {
   export type LogDescription = TypedLogDescription<Event>;
 }
 
+export namespace FlightRegisteredEvent {
+  export type InputTuple = [flightKey: BytesLike, statusCode: BigNumberish];
+  export type OutputTuple = [flightKey: string, statusCode: bigint];
+  export interface OutputObject {
+    flightKey: string;
+    statusCode: bigint;
+  }
+  export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+  export type Filter = TypedDeferredTopicFilter<Event>;
+  export type Log = TypedEventLog<Event>;
+  export type LogDescription = TypedLogDescription<Event>;
+}
+
+export namespace FlightStatusInfoEvent {
+  export type InputTuple = [
+    airline: AddressLike,
+    flight: string,
+    timestamp: BigNumberish,
+    status: BigNumberish
+  ];
+  export type OutputTuple = [
+    airline: string,
+    flight: string,
+    timestamp: bigint,
+    status: bigint
+  ];
+  export interface OutputObject {
+    airline: string;
+    flight: string;
+    timestamp: bigint;
+    status: bigint;
+  }
+  export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+  export type Filter = TypedDeferredTopicFilter<Event>;
+  export type Log = TypedEventLog<Event>;
+  export type LogDescription = TypedLogDescription<Event>;
+}
+
+export namespace FlightStatusUpdatedEvent {
+  export type InputTuple = [flightKey: BytesLike, statusCode: BigNumberish];
+  export type OutputTuple = [flightKey: string, statusCode: bigint];
+  export interface OutputObject {
+    flightKey: string;
+    statusCode: bigint;
+  }
+  export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+  export type Filter = TypedDeferredTopicFilter<Event>;
+  export type Log = TypedEventLog<Event>;
+  export type LogDescription = TypedLogDescription<Event>;
+}
+
 export namespace InsuranceCreditedEvent {
   export type InputTuple = [passenger: AddressLike, amount: BigNumberish];
   export type OutputTuple = [passenger: string, amount: bigint];
@@ -298,6 +410,68 @@ export namespace InsuranceWithdrawnEvent {
   export interface OutputObject {
     passenger: string;
     amount: bigint;
+  }
+  export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+  export type Filter = TypedDeferredTopicFilter<Event>;
+  export type Log = TypedEventLog<Event>;
+  export type LogDescription = TypedLogDescription<Event>;
+}
+
+export namespace OracleRegisteredEvent {
+  export type InputTuple = [oracle: AddressLike];
+  export type OutputTuple = [oracle: string];
+  export interface OutputObject {
+    oracle: string;
+  }
+  export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+  export type Filter = TypedDeferredTopicFilter<Event>;
+  export type Log = TypedEventLog<Event>;
+  export type LogDescription = TypedLogDescription<Event>;
+}
+
+export namespace OracleReportEvent {
+  export type InputTuple = [
+    airline: AddressLike,
+    flight: string,
+    timestamp: BigNumberish,
+    status: BigNumberish
+  ];
+  export type OutputTuple = [
+    airline: string,
+    flight: string,
+    timestamp: bigint,
+    status: bigint
+  ];
+  export interface OutputObject {
+    airline: string;
+    flight: string;
+    timestamp: bigint;
+    status: bigint;
+  }
+  export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+  export type Filter = TypedDeferredTopicFilter<Event>;
+  export type Log = TypedEventLog<Event>;
+  export type LogDescription = TypedLogDescription<Event>;
+}
+
+export namespace OracleRequestEvent {
+  export type InputTuple = [
+    index: BigNumberish,
+    airline: AddressLike,
+    flight: string,
+    timestamp: BigNumberish
+  ];
+  export type OutputTuple = [
+    index: bigint,
+    airline: string,
+    flight: string,
+    timestamp: bigint
+  ];
+  export interface OutputObject {
+    index: bigint;
+    airline: string;
+    flight: string;
+    timestamp: bigint;
   }
   export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
   export type Filter = TypedDeferredTopicFilter<Event>;
@@ -385,6 +559,8 @@ export interface FlightSuretyData extends BaseContract {
     event?: TCEvent
   ): Promise<this>;
 
+  REGISTRATION_FEE: TypedContractMethod<[], [bigint], "view">;
+
   authorizeContract: TypedContractMethod<
     [contractAddress: AddressLike],
     [void],
@@ -413,9 +589,28 @@ export interface FlightSuretyData extends BaseContract {
     "view"
   >;
 
+  getFlight: TypedContractMethod<
+    [flightKey: BytesLike],
+    [
+      [string, bigint, string, string, boolean, bigint, bigint, string] & {
+        name: string;
+        datetime: bigint;
+        origin: string;
+        destination: string;
+        isRegistered: boolean;
+        statusCode: bigint;
+        updatedTimestamp: bigint;
+        airline: string;
+      }
+    ],
+    "view"
+  >;
+
   getInsuranceLimit: TypedContractMethod<[], [bigint], "view">;
 
   getInsuranceRatePercent: TypedContractMethod<[], [bigint], "view">;
+
+  getMyIndexes: TypedContractMethod<[], [[bigint, bigint, bigint]], "view">;
 
   getPassengerCredit: TypedContractMethod<[], [bigint], "view">;
 
@@ -438,17 +633,49 @@ export interface FlightSuretyData extends BaseContract {
   >;
 
   registerAirline: TypedContractMethod<
-    [airlineAddress: AddressLike, name: string],
+    [airline: AddressLike],
     [void],
     "nonpayable"
   >;
+
+  registerFlight: TypedContractMethod<
+    [
+      flightKey: BytesLike,
+      name: string,
+      timestamp: BigNumberish,
+      origin: string,
+      destination: string
+    ],
+    [void],
+    "nonpayable"
+  >;
+
+  registerOracle: TypedContractMethod<[], [void], "payable">;
 
   renounceOwnership: TypedContractMethod<[], [void], "nonpayable">;
 
   setPausableStatus: TypedContractMethod<[mode: boolean], [void], "nonpayable">;
 
+  submitOracleResponse: TypedContractMethod<
+    [
+      index: BigNumberish,
+      airline: AddressLike,
+      flight: string,
+      timestamp: BigNumberish,
+      statusCode: BigNumberish
+    ],
+    [void],
+    "nonpayable"
+  >;
+
   transferOwnership: TypedContractMethod<
     [newOwner: AddressLike],
+    [void],
+    "nonpayable"
+  >;
+
+  updateFlightStatus: TypedContractMethod<
+    [flightKey: BytesLike, statusCode: BigNumberish],
     [void],
     "nonpayable"
   >;
@@ -459,6 +686,9 @@ export interface FlightSuretyData extends BaseContract {
     key: string | FunctionFragment
   ): T;
 
+  getFunction(
+    nameOrSignature: "REGISTRATION_FEE"
+  ): TypedContractMethod<[], [bigint], "view">;
   getFunction(
     nameOrSignature: "authorizeContract"
   ): TypedContractMethod<[contractAddress: AddressLike], [void], "nonpayable">;
@@ -482,11 +712,32 @@ export interface FlightSuretyData extends BaseContract {
     "view"
   >;
   getFunction(
+    nameOrSignature: "getFlight"
+  ): TypedContractMethod<
+    [flightKey: BytesLike],
+    [
+      [string, bigint, string, string, boolean, bigint, bigint, string] & {
+        name: string;
+        datetime: bigint;
+        origin: string;
+        destination: string;
+        isRegistered: boolean;
+        statusCode: bigint;
+        updatedTimestamp: bigint;
+        airline: string;
+      }
+    ],
+    "view"
+  >;
+  getFunction(
     nameOrSignature: "getInsuranceLimit"
   ): TypedContractMethod<[], [bigint], "view">;
   getFunction(
     nameOrSignature: "getInsuranceRatePercent"
   ): TypedContractMethod<[], [bigint], "view">;
+  getFunction(
+    nameOrSignature: "getMyIndexes"
+  ): TypedContractMethod<[], [[bigint, bigint, bigint]], "view">;
   getFunction(
     nameOrSignature: "getPassengerCredit"
   ): TypedContractMethod<[], [bigint], "view">;
@@ -507,11 +758,23 @@ export interface FlightSuretyData extends BaseContract {
   ): TypedContractMethod<[flightKey: BytesLike], [void], "payable">;
   getFunction(
     nameOrSignature: "registerAirline"
+  ): TypedContractMethod<[airline: AddressLike], [void], "nonpayable">;
+  getFunction(
+    nameOrSignature: "registerFlight"
   ): TypedContractMethod<
-    [airlineAddress: AddressLike, name: string],
+    [
+      flightKey: BytesLike,
+      name: string,
+      timestamp: BigNumberish,
+      origin: string,
+      destination: string
+    ],
     [void],
     "nonpayable"
   >;
+  getFunction(
+    nameOrSignature: "registerOracle"
+  ): TypedContractMethod<[], [void], "payable">;
   getFunction(
     nameOrSignature: "renounceOwnership"
   ): TypedContractMethod<[], [void], "nonpayable">;
@@ -519,8 +782,28 @@ export interface FlightSuretyData extends BaseContract {
     nameOrSignature: "setPausableStatus"
   ): TypedContractMethod<[mode: boolean], [void], "nonpayable">;
   getFunction(
+    nameOrSignature: "submitOracleResponse"
+  ): TypedContractMethod<
+    [
+      index: BigNumberish,
+      airline: AddressLike,
+      flight: string,
+      timestamp: BigNumberish,
+      statusCode: BigNumberish
+    ],
+    [void],
+    "nonpayable"
+  >;
+  getFunction(
     nameOrSignature: "transferOwnership"
   ): TypedContractMethod<[newOwner: AddressLike], [void], "nonpayable">;
+  getFunction(
+    nameOrSignature: "updateFlightStatus"
+  ): TypedContractMethod<
+    [flightKey: BytesLike, statusCode: BigNumberish],
+    [void],
+    "nonpayable"
+  >;
   getFunction(
     nameOrSignature: "withdrawCredit"
   ): TypedContractMethod<[], [void], "nonpayable">;
@@ -554,6 +837,27 @@ export interface FlightSuretyData extends BaseContract {
     DeauthorizedContractEvent.OutputObject
   >;
   getEvent(
+    key: "FlightRegistered"
+  ): TypedContractEvent<
+    FlightRegisteredEvent.InputTuple,
+    FlightRegisteredEvent.OutputTuple,
+    FlightRegisteredEvent.OutputObject
+  >;
+  getEvent(
+    key: "FlightStatusInfo"
+  ): TypedContractEvent<
+    FlightStatusInfoEvent.InputTuple,
+    FlightStatusInfoEvent.OutputTuple,
+    FlightStatusInfoEvent.OutputObject
+  >;
+  getEvent(
+    key: "FlightStatusUpdated"
+  ): TypedContractEvent<
+    FlightStatusUpdatedEvent.InputTuple,
+    FlightStatusUpdatedEvent.OutputTuple,
+    FlightStatusUpdatedEvent.OutputObject
+  >;
+  getEvent(
     key: "InsuranceCredited"
   ): TypedContractEvent<
     InsuranceCreditedEvent.InputTuple,
@@ -573,6 +877,27 @@ export interface FlightSuretyData extends BaseContract {
     InsuranceWithdrawnEvent.InputTuple,
     InsuranceWithdrawnEvent.OutputTuple,
     InsuranceWithdrawnEvent.OutputObject
+  >;
+  getEvent(
+    key: "OracleRegistered"
+  ): TypedContractEvent<
+    OracleRegisteredEvent.InputTuple,
+    OracleRegisteredEvent.OutputTuple,
+    OracleRegisteredEvent.OutputObject
+  >;
+  getEvent(
+    key: "OracleReport"
+  ): TypedContractEvent<
+    OracleReportEvent.InputTuple,
+    OracleReportEvent.OutputTuple,
+    OracleReportEvent.OutputObject
+  >;
+  getEvent(
+    key: "OracleRequest"
+  ): TypedContractEvent<
+    OracleRequestEvent.InputTuple,
+    OracleRequestEvent.OutputTuple,
+    OracleRequestEvent.OutputObject
   >;
   getEvent(
     key: "OwnershipTransferred"
@@ -641,6 +966,39 @@ export interface FlightSuretyData extends BaseContract {
       DeauthorizedContractEvent.OutputObject
     >;
 
+    "FlightRegistered(bytes32,uint8)": TypedContractEvent<
+      FlightRegisteredEvent.InputTuple,
+      FlightRegisteredEvent.OutputTuple,
+      FlightRegisteredEvent.OutputObject
+    >;
+    FlightRegistered: TypedContractEvent<
+      FlightRegisteredEvent.InputTuple,
+      FlightRegisteredEvent.OutputTuple,
+      FlightRegisteredEvent.OutputObject
+    >;
+
+    "FlightStatusInfo(address,string,uint256,uint8)": TypedContractEvent<
+      FlightStatusInfoEvent.InputTuple,
+      FlightStatusInfoEvent.OutputTuple,
+      FlightStatusInfoEvent.OutputObject
+    >;
+    FlightStatusInfo: TypedContractEvent<
+      FlightStatusInfoEvent.InputTuple,
+      FlightStatusInfoEvent.OutputTuple,
+      FlightStatusInfoEvent.OutputObject
+    >;
+
+    "FlightStatusUpdated(bytes32,uint8)": TypedContractEvent<
+      FlightStatusUpdatedEvent.InputTuple,
+      FlightStatusUpdatedEvent.OutputTuple,
+      FlightStatusUpdatedEvent.OutputObject
+    >;
+    FlightStatusUpdated: TypedContractEvent<
+      FlightStatusUpdatedEvent.InputTuple,
+      FlightStatusUpdatedEvent.OutputTuple,
+      FlightStatusUpdatedEvent.OutputObject
+    >;
+
     "InsuranceCredited(address,uint256)": TypedContractEvent<
       InsuranceCreditedEvent.InputTuple,
       InsuranceCreditedEvent.OutputTuple,
@@ -672,6 +1030,39 @@ export interface FlightSuretyData extends BaseContract {
       InsuranceWithdrawnEvent.InputTuple,
       InsuranceWithdrawnEvent.OutputTuple,
       InsuranceWithdrawnEvent.OutputObject
+    >;
+
+    "OracleRegistered(address)": TypedContractEvent<
+      OracleRegisteredEvent.InputTuple,
+      OracleRegisteredEvent.OutputTuple,
+      OracleRegisteredEvent.OutputObject
+    >;
+    OracleRegistered: TypedContractEvent<
+      OracleRegisteredEvent.InputTuple,
+      OracleRegisteredEvent.OutputTuple,
+      OracleRegisteredEvent.OutputObject
+    >;
+
+    "OracleReport(address,string,uint256,uint8)": TypedContractEvent<
+      OracleReportEvent.InputTuple,
+      OracleReportEvent.OutputTuple,
+      OracleReportEvent.OutputObject
+    >;
+    OracleReport: TypedContractEvent<
+      OracleReportEvent.InputTuple,
+      OracleReportEvent.OutputTuple,
+      OracleReportEvent.OutputObject
+    >;
+
+    "OracleRequest(uint8,address,string,uint256)": TypedContractEvent<
+      OracleRequestEvent.InputTuple,
+      OracleRequestEvent.OutputTuple,
+      OracleRequestEvent.OutputObject
+    >;
+    OracleRequest: TypedContractEvent<
+      OracleRequestEvent.InputTuple,
+      OracleRequestEvent.OutputTuple,
+      OracleRequestEvent.OutputObject
     >;
 
     "OwnershipTransferred(address,address)": TypedContractEvent<

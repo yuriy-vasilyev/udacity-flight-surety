@@ -37,6 +37,14 @@ declare module "hardhat/types/runtime" {
       name: "FlightSuretyData",
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.FlightSuretyData__factory>;
+    getContractFactory(
+      name: "FlightSuretyData",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.FlightSuretyData__factory>;
+    getContractFactory(
+      name: "FlightSuretyData",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.FlightSuretyData__factory>;
 
     getContractAt(
       name: "Ownable",
@@ -68,6 +76,16 @@ declare module "hardhat/types/runtime" {
       address: string | ethers.Addressable,
       signer?: ethers.Signer
     ): Promise<Contracts.FlightSuretyData>;
+    getContractAt(
+      name: "FlightSuretyData",
+      address: string | ethers.Addressable,
+      signer?: ethers.Signer
+    ): Promise<Contracts.FlightSuretyData>;
+    getContractAt(
+      name: "FlightSuretyData",
+      address: string | ethers.Addressable,
+      signer?: ethers.Signer
+    ): Promise<Contracts.FlightSuretyData>;
 
     deployContract(
       name: "Ownable",
@@ -89,6 +107,14 @@ declare module "hardhat/types/runtime" {
       name: "FlightSuretyApp",
       signerOrOptions?: ethers.Signer | DeployContractOptions
     ): Promise<Contracts.FlightSuretyApp>;
+    deployContract(
+      name: "FlightSuretyData",
+      signerOrOptions?: ethers.Signer | DeployContractOptions
+    ): Promise<Contracts.FlightSuretyData>;
+    deployContract(
+      name: "FlightSuretyData",
+      signerOrOptions?: ethers.Signer | DeployContractOptions
+    ): Promise<Contracts.FlightSuretyData>;
     deployContract(
       name: "FlightSuretyData",
       signerOrOptions?: ethers.Signer | DeployContractOptions
@@ -119,6 +145,16 @@ declare module "hardhat/types/runtime" {
       args: any[],
       signerOrOptions?: ethers.Signer | DeployContractOptions
     ): Promise<Contracts.FlightSuretyApp>;
+    deployContract(
+      name: "FlightSuretyData",
+      args: any[],
+      signerOrOptions?: ethers.Signer | DeployContractOptions
+    ): Promise<Contracts.FlightSuretyData>;
+    deployContract(
+      name: "FlightSuretyData",
+      args: any[],
+      signerOrOptions?: ethers.Signer | DeployContractOptions
+    ): Promise<Contracts.FlightSuretyData>;
     deployContract(
       name: "FlightSuretyData",
       args: any[],

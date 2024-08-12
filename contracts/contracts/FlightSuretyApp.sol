@@ -78,12 +78,11 @@ contract FlightSuretyApp is Ownable, Pausable, ReentrancyGuard {
    *
    */
   function processFlightStatus(
-    address airline,
     string memory flight,
     bytes32 flightKey,
     uint256 timestamp,
     uint8 statusCode
-  ) internal pure {
+  ) internal {
     require(flights[flightKey].isRegistered, "Flight is not registered.");
 
     flights[flightKey].updatedTimestamp = timestamp;
@@ -258,7 +257,7 @@ contract FlightSuretyApp is Ownable, Pausable, ReentrancyGuard {
       emit FlightStatusInfo(airline, flight, timestamp, statusCode);
 
       // Handle flight status as appropriate
-      processFlightStatus(airline, flight, timestamp, statusCode);
+      processFlightStatus(flight, key, timestamp, statusCode);
     }
   }
 
@@ -330,13 +329,16 @@ contract FlightSuretyApp is Ownable, Pausable, ReentrancyGuard {
   }
 }
 
-contract FlightSuretyData {
+abstract contract FlightSuretyData {
   function registerAirline(
     address airlineAddress,
     string calldata name
-  ) external returns (bool);
-  function creditInsurees(string calldata flightCode) external;
+  ) external virtual returns (bool);
+  function creditInsurees(string calldata flightCode) external virtual;
   function withdraw(
     address payable insuredPassenger
-  ) public returns (uint256, uint256, uint256, uint256, address, address);
+  )
+    public
+    virtual
+    returns (uint256, uint256, uint256, uint256, address, address);
 }
